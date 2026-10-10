@@ -1,52 +1,116 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
 { config, pkgs, ... }:
 
-{
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+let
+  # FHS container environment for Android ROM and kernel compilation
+  android-env = pkgs.buildFHSEnv {
+    name = "android-env";
+    targetPkgs = pkgs: with pkgs; [
+      # Core build systems & utilities
+      git
+      git-repo
+      git-lfs
+      gnupg
+      flex
+      bison
+      gperf
+      gcc
+      gnumake
+      binutils
+      patch
+      diffutils
+      cmake
+      ninja
+      pkg-config
+      autoconf
+      automake
+      libtool
+      fakeroot
+      schedtool
+      procps
+      psmisc
+      which
+      file
+      bc
+      rsync
+      zip
+      unzip
+      curl
+      wget
+      nettools
+
+      # Compilers, runtimes & Python packages
+      clang
+      llvmPackages.bintools
+      jdk
+      python3
+      python3Packages.pip
+      python3Packages.pyelftools
+
+      # Headers & libraries
+      glibc.dev
+      libgcc
+      zlib
+      openssl
+      libxml2
+      fontconfig
+      freetype
+      elfutils
+      ncurses
+      libxcrypt-legacy
     ];
 
-  # Use the systemd-boot EFI boot loader.
+    # 32-bit compatibility libraries required by legacy toolchains and prebuilts
+    multiPkgs = pkgs: with pkgs; [
+      zlib
+      ncurses
+      libxcrypt-legacy
+    ];
+
+    runScript = "bash";
+
+    profile = ''
+      export LC_ALL=C
+      export USE_CCACHE=1
+      export ANDROID_BUILD_TOP="$(pwd)"
+    '';
+  };
+in
+{
+  imports = [
+    ./hardware-configuration.nix
+  ];
+
+  # Bootloader & Kernel
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
+  # Networking
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
+  # Localization & Time
   time.timeZone = "Asia/Kathmandu";
-
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # Enable the GNOME Desktop Environment.
+  # Desktop Environment (GNOME)
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
-  # Enable CUPS to print documents.
+  # Native browser connector for extensions.gnome.org
+  services.gnome.gnome-browser-connector.enable = true;
+
+  # Enable Flatpak support so GNOME Software can install graphical apps
+  services.flatpak.enable = true;
+
+  # Printing
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
+  # Audio (PipeWire)
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -54,107 +118,86 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    # jack.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # User Account
   users.users."aayam422h" = {
     isNormalUser = true;
     description = "aayam422h";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
   };
 
-  # Install firefox.
+  # Shell and default programs
+  programs.zsh.enable = true;
   programs.firefox.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
 
-  # Allow unfree packages
+  # Allow proprietary packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile.
-  # You can use https://search.nixos.org/ to find more packages (and options).
-environment.systemPackages = with pkgs; [
-	vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-	wget
-	fastfetch
-	google-chrome
-	telegram-desktop
-	git
-	git-repo
-	git-lfs
-	clang
-	gcc
-	gnumake
-	binutils
-	patch
-	cmake
-	ninja
-	pkg-config
-	fakeroot
-	autoconf
-	automake
-	libtool
-	python3
-	jdk
-	maven
-	gradle
-	neovim
-	gh
-	zsh
-	tree
-	curl
-   ];
+  # System-wide packages
+  environment.systemPackages = with pkgs; [
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
- programs.gnupg.agent = {
-     enable = true;
-     enableSSHSupport = true;
-   };
+    # Audio
+    jamesdsp
+    # Custom environments & Android tools
+    android-env
+    android-tools
 
-  # List services that you want to enable:
+    # GNOME Management & Customization
+    gnomeExtensions.appindicator # Tray notifier 
+    gnome-software           # GNOME Software store
+    gnome-extension-manager  # Offline/GUI extension browser & manager
+    gnome-tweaks             # Classic GNOME Tweaks
+    refine                   # Modern GNOME Refine tool
 
-  # Enable the OpenSSH daemon.
+    # General utilities & editors
+    vim
+    neovim
+    fastfetch
+    tmux
+    tree
+    wget
+    curl
+    google-chrome
+    telegram-desktop
+
+    # Development & version control
+    git
+    git-repo
+    git-lfs
+    gh
+
+    # Build tools & compilers
+    clang
+    gcc
+    gnumake
+    binutils
+    patch
+    cmake
+    ninja
+    pkg-config
+    fakeroot
+    autoconf
+    automake
+    libtool
+
+    # Languages & Runtimes
+    python3
+    jdk
+    maven
+    gradle
+  ];
+
+  # System services
   services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  # Flakes and new CLI tool support
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This option defines the first version of NixOS you have installed on this particular machine,
-  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
-  #
-  # Most users should NEVER change this value after the initial install, for any reason,
-  # even if you've upgraded your system to a new NixOS release.
-  #
-  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
-  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
-  # to actually do that.
-  #
-  # This value being lower than the current NixOS release does NOT mean your system is
-  # out of date, out of support, or vulnerable.
-  #
-  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
-  # and migrated your data accordingly.
-  #
-  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
-  system.stateVersion = "26.05"; # Did you read the comment?
-
-# Enable Flakes and the new command-line tool
-nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
+  # State version
+  system.stateVersion = "26.05";
 }
