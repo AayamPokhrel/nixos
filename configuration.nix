@@ -192,6 +192,12 @@ in
     gradle
   ];
 
+# Load all nerd fonts
+fonts.packages = with pkgs; [
+    # Extracts and installs every derivation inside pkgs.nerd-fonts (~10+ GB)
+    (builtins.filter lib.isDerivation (builtins.attrValues pkgs.nerd-fonts))
+  ];
+
   # System services
   services.openssh.enable = true;
 
