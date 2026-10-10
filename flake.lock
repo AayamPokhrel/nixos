@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "libdisplay-info-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788168488,
+        "narHash": "sha256-ygKGKhq6ZdVzx3jvYsFRRzTf81VF26W2MH9wpOO4nPk=",
+        "ref": "main",
+        "rev": "62a9346c3dce2bddba1d4dc186949e4320d6f801",
+        "revCount": 361,
+        "type": "git",
+        "url": "https://gitlab.freedesktop.org/emersion/libdisplay-info.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://gitlab.freedesktop.org/emersion/libdisplay-info.git"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1791456040,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "libdisplay-info-src": "libdisplay-info-src",
         "nixpkgs": "nixpkgs"
       }
     }

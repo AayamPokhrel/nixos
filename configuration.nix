@@ -194,9 +194,10 @@ in
 
 # Load all nerd fonts
 fonts.packages = with pkgs; [
-    # Extracts and installs every derivation inside pkgs.nerd-fonts (~10+ GB)
-    (builtins.filter lib.isDerivation (builtins.attrValues pkgs.nerd-fonts))
-  ];
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-color-emoji
+  ] ++ (builtins.filter pkgs.lib.isDerivation (builtins.attrValues pkgs.nerd-fonts));
 
   # System services
   services.openssh.enable = true;
