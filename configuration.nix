@@ -37,6 +37,12 @@ let
       curl
       wget
       nettools
+      ccache
+
+      # Partition & blob extraction tools (provides fsck.erofs)
+      erofs-utils
+      e2fsprogs
+      brotli
 
       # Compilers, runtimes & Python packages
       clang
@@ -48,6 +54,7 @@ let
 
       # Headers & libraries
       glibc.dev
+      glibc.static
       libgcc
       zlib
       openssl
@@ -56,6 +63,7 @@ let
       freetype
       elfutils
       ncurses
+      ncurses5
       libxcrypt-legacy
     ];
 
@@ -71,7 +79,8 @@ let
     profile = ''
       export LC_ALL=C
       export USE_CCACHE=1
-      export ANDROID_BUILD_TOP="$(pwd)"
+      export CCACHE_EXEC=$(which ccache 2>/dev/null || true)
+      export ALLOW_NINJA_ENV=true
     '';
   };
 in
@@ -84,6 +93,51 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Kernel parameters for HDR and DRM modesetting:
+  # - amdgpu.dcdebugmask=0x10 exposes modern 3D LUT and color management blocks to Wayland
+  # - nvidia-drm.modeset=1 enables DRM KMS for the NVIDIA driver
+  boot.kernelParams = [
+    "amdgpu.dcdebugmask=0x10"
+    "nvidia-drm.modeset=1"
+  ];
+
+  # CPU Microcode & Firmware
+  hardware.cpu.amd.updateMicrocode = true;
+  hardware.enableRedistributableFirmware = true;
+
+  # Hardware Acceleration & Vulkan (64-bit and 32-bit)
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+    extraPackages = with pkgs; [
+      vulkan-loader
+      vulkan-validation-layers
+    ];
+  };
+
+  # NVIDIA Driver Stack
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = true;
+    powerManagement.finegrained = false;
+    # Uses open-source kernel modules (recommended for Turing, Ada Lovelace, and Blackwell architectures)
+    open = true;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+
+    # PRIME Offload (Optional):
+    # If running hybrid graphics where the AMD iGPU powers the laptop screen,
+    # run `lspci | grep -E "VGA|3D"` to get your PCI bus IDs and uncomment below:
+    # prime = {
+    #   offload.enable = true;
+    #   offload.enableOffloadCmd = true;
+    #   amdgpuBusId = "PCI:5:0:0";  # Replace with your AMD iGPU PCI ID
+    #   nvidiaBusId = "PCI:1:0:0";  # Replace with your NVIDIA dGPU PCI ID
+    # };
+  };
 
   # Networking
   networking.hostName = "nixos";
@@ -101,10 +155,13 @@ in
     variant = "";
   };
 
+  # Color Management Daemon (required for accurate HDR tone mapping and ICC profiles)
+  services.colord.enable = true;
+
   # Native browser connector for extensions.gnome.org
   services.gnome.gnome-browser-connector.enable = true;
 
-  # Enable Flatpak support so GNOME Software can install graphical apps
+  # Flatpak
   services.flatpak.enable = true;
 
   # Printing
@@ -124,39 +181,42 @@ in
   users.users."aayam422h" = {
     isNormalUser = true;
     description = "aayam422h";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "video" ];
   };
 
   # Shell and default programs
   programs.zsh.enable = true;
   programs.firefox.enable = true;
+  programs.dconf.enable = true;
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
   };
 
-  # Allow proprietary packages
+  # Allow unfree packages (VS Code, NVIDIA drivers, Google Chrome)
   nixpkgs.config.allowUnfree = true;
 
   # System-wide packages
   environment.systemPackages = with pkgs; [
-
     # Audio
     jamesdsp
+
     # Custom environments & Android tools
     android-env
     android-tools
+    erofs-utils
 
     # GNOME Management & Customization
-    gnomeExtensions.appindicator # Tray notifier 
-    gnome-software           # GNOME Software store
-    gnome-extension-manager  # Offline/GUI extension browser & manager
-    gnome-tweaks             # Classic GNOME Tweaks
-    refine                   # Modern GNOME Refine tool
+    gnomeExtensions.appindicator
+    gnome-software
+    gnome-extension-manager
+    gnome-tweaks
+    refine
 
-    # General utilities & editors
+    # General utilities, editors & IDEs
     vim
     neovim
+    vscode
     fastfetch
     tmux
     tree
@@ -164,6 +224,12 @@ in
     curl
     google-chrome
     telegram-desktop
+
+    # Graphics, Vulkan & Hardware inspection tools
+    vulkan-tools
+    libdrm
+    pciutils
+    clinfo
 
     # Development & version control
     git
@@ -192,8 +258,8 @@ in
     gradle
   ];
 
-# Load all nerd fonts
-fonts.packages = with pkgs; [
+  # Fonts
+  fonts.packages = with pkgs; [
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
