@@ -87,6 +87,7 @@ in
 {
   imports = [
     ./hardware-configuration.nix
+    ./private-packages.nix
   ];
 
   # Bootloader & Kernel
