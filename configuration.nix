@@ -212,6 +212,7 @@ in
     gnome-extension-manager
     gnome-tweaks
     refine
+    libgtop
 
     # General utilities, editors & IDEs
     vim
