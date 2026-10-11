@@ -88,6 +88,7 @@ in
   imports = [
     ./hardware-configuration.nix
     /etc/nixos-private/private-packages.nix
+    ./extras.nix
   ];
 
   # Bootloader & Kernel
