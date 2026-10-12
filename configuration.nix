@@ -102,6 +102,7 @@ in
   boot.kernelParams = [
     "amdgpu.dcdebugmask=0x10"
     "nvidia-drm.modeset=1"
+    "gpiolib_acpi.ignore_interrupt=AMDI0030:00@4"
   ];
 
   # CPU Microcode & Firmware
