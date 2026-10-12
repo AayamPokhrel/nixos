@@ -211,6 +211,7 @@ in
 
     # GNOME Management & Customization
     gnomeExtensions.appindicator
+    gnomeExtensions.system-monitor
     gnome-software
     gnome-extension-manager
     gnome-tweaks
