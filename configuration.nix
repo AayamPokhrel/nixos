@@ -74,6 +74,21 @@ let
       libxcrypt-legacy
     ];
 
+    extraBuildCommands = ''
+      mkdir -p $out/usr/lib64/x86_64-linux-gnu
+      mkdir -p $out/usr/include/x86_64-linux-gnu
+      mkdir -p $out/usr/lib64/gcc/x86_64-linux-gnu
+      mkdir -p $out/usr/lib64/gcc/x86_64-unknown-linux-gnu
+
+      # Link GCC runtime objects and static libgcc into /usr/lib64 (and /usr/lib)
+      ln -s ${pkgs.gcc.cc}/lib/gcc/*/*/*.o $out/usr/lib64/
+      ln -s ${pkgs.gcc.cc}/lib/gcc/*/*/*.a $out/usr/lib64/
+
+      # Link the GCC toolchain directory for compiler autodetect
+      ln -s ${pkgs.gcc.cc}/lib/gcc/*/* $out/usr/lib64/gcc/x86_64-linux-gnu/${pkgs.gcc.version}
+      ln -s ${pkgs.gcc.cc}/lib/gcc/*/* $out/usr/lib64/gcc/x86_64-unknown-linux-gnu/${pkgs.gcc.version}
+    '';
+
     runScript = "bash";
 
     profile = ''
@@ -81,6 +96,7 @@ let
       export USE_CCACHE=1
       export CCACHE_EXEC=$(which ccache 2>/dev/null || true)
       export ALLOW_NINJA_ENV=true
+      export LIBRARY_PATH="${pkgs.gcc.cc}/lib/gcc/x86_64-unknown-linux-gnu/${pkgs.gcc.version}:$LIBRARY_PATH"
     '';
   };
 in
