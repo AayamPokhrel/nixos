@@ -74,6 +74,8 @@ let
       libxcrypt-legacy
     ];
 
+    extraOutputsToInstall = [ "dev" ];
+
     extraBuildCommands = ''
       mkdir -p $out/usr/lib64/x86_64-linux-gnu
       mkdir -p $out/usr/include/x86_64-linux-gnu
