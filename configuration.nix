@@ -248,6 +248,7 @@ in
     curl
     google-chrome
     telegram-desktop
+    libreoffice
 
     # Graphics, Vulkan & Hardware inspection tools
     vulkan-tools
