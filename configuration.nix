@@ -217,7 +217,6 @@ in
     enable = true;
     enableSSHSupport = true;
   };
-  programs.nix-ld.enable = true;
 
   # Allow unfree packages (VS Code, NVIDIA drivers, Google Chrome)
   nixpkgs.config.allowUnfree = true;
@@ -242,12 +241,12 @@ in
     gnome-tweaks
     refine
     libgtop
+    btop
 
     # General utilities, editors & IDEs
     vim
     neovim
     vscode
-    jetbrains-toolbox
     fastfetch
     tmux
     tree

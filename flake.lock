@@ -73,7 +73,8 @@
       "inputs": {
         "ajazz-ak820-max": "ajazz-ak820-max",
         "libdisplay-info-src": "libdisplay-info-src",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "toolbox": "toolbox"
       }
     },
     "systems": {
@@ -90,6 +91,22 @@
         "repo": "default",
         "type": "github"
       }
+    },
+    "toolbox": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./toolbox",
+        "type": "path"
+      },
+      "original": {
+        "path": "./toolbox",
+        "type": "path"
+      },
+      "parent": []
     }
   },
   "root": "root",
