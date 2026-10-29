@@ -231,6 +231,7 @@ in
     android-tools
     erofs-utils
     scrcpy
+    android-studio
 
     # GNOME Management & Customization
     gnomeExtensions.appindicator
