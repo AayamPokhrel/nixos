@@ -26,6 +26,36 @@
                 src = libdisplay-info-src;
               });
             })
+            (final: prev: {
+              jetbrains-toolbox =
+                let
+                  version = "3.9.0.88839";
+                  src = prev.fetchzip {
+                    url = "https://download.jetbrains.com/toolbox/jetbrains-toolbox-${version}.tar.gz";
+                    hash = "sha256-Nqov5++wuLy4r08N6inyBmdr9eTdQknrc1AFf0jywTs=";
+                  };
+                in
+                prev.buildFHSEnv {
+                  pname = "jetbrains-toolbox";
+                  inherit version;
+                  meta = prev.jetbrains-toolbox.meta // {
+                    mainProgram = "jetbrains-toolbox";
+                  };
+                  multiPkgs =
+                    p:
+                    with p;
+                    [
+                      icu
+                      libappindicator
+                    ]
+                    ++ prev.appimageTools.defaultFhsEnvArgs.multiPkgs p;
+                  runScript = "${src}/bin/jetbrains-toolbox --update-failed";
+                  extraInstallCommands = ''
+                    install -Dm0644 ${src}/bin/jetbrains-toolbox.desktop -t $out/share/applications
+                    install -Dm0644 ${src}/bin/toolbox-tray-color.png $out/share/icons/hicolor/32x32/apps/jetbrains-toolbox.png
+                  '';
+                };
+            })
           ];
         }
         ./configuration.nix
