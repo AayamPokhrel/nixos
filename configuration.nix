@@ -202,14 +202,11 @@ in
   users.users."aayam422h" = {
     isNormalUser = true;
     description = "aayam422h";
-    extraGroups = [ "networkmanager" "wheel" "video" "input" ];
+    extraGroups = [ "networkmanager" "wheel" "video" ];
   };
 
-  # Ajazz AK820 Max Keyboard Driver & RGB Studio (v1.1.0)
-  hardware.ajazz-ak820-max.enable = true;
-  hardware.ajazz-ak820-max.daemon.enable = true;
-
   # Shell and default programs
+  programs.nix-ld.enable = true;
   programs.zsh.enable = true;
   programs.firefox.enable = true;
   programs.dconf.enable = true;
