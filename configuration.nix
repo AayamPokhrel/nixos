@@ -107,6 +107,7 @@ in
     ./hardware-configuration.nix
     /etc/nixos-private/private-packages.nix
     ./extras.nix
+    ./zen.nix
   ];
 
   # Bootloader & Kernel
@@ -202,8 +203,12 @@ in
   users.users."aayam422h" = {
     isNormalUser = true;
     description = "aayam422h";
-    extraGroups = [ "networkmanager" "wheel" "video" ];
+    extraGroups = [ "networkmanager" "wheel" "video" "input" ];
   };
+
+  # Ajazz AK820 Max Keyboard Driver & RGB Studio (v1.2.0)
+  hardware.ajazz-ak820-max.enable = true;
+  hardware.ajazz-ak820-max.daemon.enable = true;
 
   # Shell and default programs
   programs.nix-ld.enable = true;
