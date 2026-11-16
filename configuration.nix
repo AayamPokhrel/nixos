@@ -210,6 +210,9 @@ in
   hardware.ajazz-ak820-max.enable = true;
   hardware.ajazz-ak820-max.daemon.enable = true;
 
+  # Lenovo Legion Pro 5 16ADR10 Driver & CLI (v1.0.0)
+  hardware.lenovo-legion.enable = true;
+
   # Shell and default programs
   programs.nix-ld.enable = true;
   programs.zsh.enable = true;

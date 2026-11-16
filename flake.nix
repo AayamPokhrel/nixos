@@ -17,13 +17,18 @@
       url = "path:/home/aayam422h/AJAZ/ajazz-ak820-max";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    legion-linux = {
+      url = "path:/home/aayam422h/Legion_Space";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, libdisplay-info-src, ajazz-ak820-max, ... }@inputs: {
+  outputs = { legion-linux,  self, nixpkgs, libdisplay-info-src, ajazz-ak820-max, ... }@inputs: {
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
+        legion-linux.nixosModules.default
         ajazz-ak820-max.nixosModules.default
         {
           nixpkgs.overlays = [
