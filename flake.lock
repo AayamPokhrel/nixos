@@ -36,6 +36,23 @@
         "type": "github"
       }
     },
+    "legion-linux": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794839047,
+        "narHash": "sha256-0Q9q6pamYmjlw4E98tKek4bJm52kbV8czzojVlbCzxE=",
+        "path": "/home/aayam422h/Legion_Space",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/aayam422h/Legion_Space",
+        "type": "path"
+      }
+    },
     "libdisplay-info-src": {
       "flake": false,
       "locked": {
@@ -72,6 +89,7 @@
     "root": {
       "inputs": {
         "ajazz-ak820-max": "ajazz-ak820-max",
+        "legion-linux": "legion-linux",
         "libdisplay-info-src": "libdisplay-info-src",
         "nixpkgs": "nixpkgs",
         "toolbox": "toolbox",
