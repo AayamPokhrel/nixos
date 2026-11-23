@@ -1,7 +1,17 @@
 { config, pkgs, ... }:
 
+let
+  antigravityFlake = builtins.getFlake "github:jacopone/antigravity-nix";
+in
 {
-	environment.systemPackages = with pkgs; [
-		antigravity
-	];
+  # Permanently enable flakes so builtins.getFlake works on future rebuilds
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  nixpkgs.overlays = [ antigravityFlake.overlays.default ];
+
+  environment.systemPackages = with pkgs; [
+    google-antigravity      # Antigravity 2.0 App (`antigravity`)
+    google-antigravity-ide  # Antigravity IDE (`antigravity-ide`)
+    google-antigravity-cli  # Antigravity CLI (`agy`)
+  ];
 }
