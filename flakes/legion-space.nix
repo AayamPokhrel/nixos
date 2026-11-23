@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  legionFlake = builtins.getFlake "git+ssh://git@github.com/AayamPokhrel/LegionSpace4Linux.git";
+  legionFlake = builtins.getFlake "git+https://github.com/AayamPokhrel/LegionSpace4Linux.git";
 in
 {
   imports = [

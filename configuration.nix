@@ -60,6 +60,11 @@
     enableSSHSupport = true;
   };
 
+  # Preserve SSH agent across sudo for git operations in nixos-rebuild
+  security.sudo.extraConfig = ''
+    Defaults env_keep += "SSH_AUTH_SOCK"
+  '';
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
