@@ -10,10 +10,10 @@
           (builtins.attrNames (builtins.readDir ./flakes)))
     );
 
-  # Boot loader & Kernel
+  # Boot loader & Kernel (uses default stable kernel with prebuilt NVIDIA drivers)
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages;
 
   # Networking
   networking.hostName = "nixos";

@@ -38,6 +38,16 @@ let
       wget
       nettools
       ccache
+      jq
+      yq-go
+      ripgrep
+      fd
+      tree
+      cpio
+      lz4
+      dtc
+      simg2img
+      protobuf
 
       # Partition & blob extraction tools (provides fsck.erofs)
       erofs-utils
@@ -96,6 +106,8 @@ let
     profile = ''
       export LC_ALL=C
       export USE_CCACHE=1
+      export CCACHE_DIR="$HOME/.cache/ccache"
+      mkdir -p "$CCACHE_DIR"
       export CCACHE_EXEC=$(which ccache 2>/dev/null || true)
       export ALLOW_NINJA_ENV=true
       export LIBRARY_PATH="${pkgs.gcc.cc}/lib/gcc/x86_64-unknown-linux-gnu/${pkgs.gcc.version}:$LIBRARY_PATH"
@@ -106,8 +118,35 @@ in
   environment.systemPackages = with pkgs; [
     android-env
     android-tools
+    ccache
     erofs-utils
     scrcpy
     android-studio
+
+    # Android ROM, Kernel, Partition & System App Build Utilities
+    aapt
+    apksigner
+    bundletool
+    payload-dumper-go
+    simg2img
+    dtc
+    lz4
+    squashfsTools
+    android-backup-extractor
+    protobuf
+    jq
+    yq-go
+    fd
+    file
+    usbutils
+    picocom
+
+    # Prebuilt MCP Servers for Antigravity
+    mcp-nixos
+    context7-mcp
+    mcp-server-git
+    mcp-server-fetch
+    mcp-server-sequential-thinking
+    mcp-server-memory
   ];
 }

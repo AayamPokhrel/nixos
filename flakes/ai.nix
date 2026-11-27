@@ -13,5 +13,8 @@ in
     google-antigravity      # Antigravity 2.0 App (`antigravity`)
     google-antigravity-ide  # Antigravity IDE (`antigravity-ide`)
     google-antigravity-cli  # Antigravity CLI (`agy`)
+    claude-code
+    codex
+    codex-acp
   ];
 }
